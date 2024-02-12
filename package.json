@@ -1,6 +1,6 @@
 {
   "name": "@larner.dev/req",
-  "description": "A library for making http requests on react clients",
+  "description": "A library for making client side http requests with error handling",
   "version": "1.0.0",
   "author": "Aaron Larner",
   "type": "module",
