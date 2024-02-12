@@ -1,1 +1,1 @@
-export { Req } from "./Req";
+export { Req, ReqMethod } from "./Req";
