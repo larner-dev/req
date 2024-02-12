@@ -1,0 +1,49 @@
+{
+  "name": "@larner.dev/req",
+  "description": "A library for making http requests on react clients",
+  "version": "1.0.0",
+  "author": "Aaron Larner",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "concurrently \"tsc --watch\" \"vite build --watch\"",
+    "build": "tsc --declaration && vite build",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint .",
+    "postversion": "git push && git push --tags",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn test",
+    "test": "vitest --run --dir ./src",
+    "test-watch": "vitest --dir ./src",
+    "test-coverage": "vitest run --dir ./src --coverage"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "6.21.0",
+    "@typescript-eslint/parser": "6.21.0",
+    "@vitest/coverage-c8": "0.33.0",
+    "concurrently": "8.2.2",
+    "eslint": "8.56.0",
+    "eslint-config-prettier": "9.1.0",
+    "nodemon": "3.0.3",
+    "rollup-plugin-node-externals": "7.0.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8",
+    "vite-plugin-dts": "3.7.2",
+    "vitest": "1.2.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT"
+}
