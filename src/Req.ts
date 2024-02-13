@@ -17,12 +17,12 @@ interface ReqEventHandler {
   cb: (data: any) => void;
 }
 
-type Code = "NETWORK" | "UNKNOWN";
+export type ReqCode = "NETWORK" | "UNKNOWN";
 
 class ExtendedError<T extends string = string> extends Error {
   public status: number = -1;
   public params: any = null;
-  public code: T | Code = "UNKNOWN";
+  public code: T | ReqCode = "UNKNOWN";
 }
 
 export class Req {
@@ -88,7 +88,7 @@ export class Req {
         // eslint-disable-next-line no-console
         console.log("request.raw fetch_error", err);
       }
-      const error = err as ExtendedError<Code>;
+      const error = err as ExtendedError<ReqCode>;
       error.code = "NETWORK";
       error.status = -1;
       this.callHandlers(ReqEventType.Error, error);
