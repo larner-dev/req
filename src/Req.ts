@@ -17,10 +17,12 @@ interface ReqEventHandler {
   cb: (data: any) => void;
 }
 
-class ExtendedError extends Error {
-  public network: boolean = false;
+type Code = "NETWORK" | "UNKNOWN";
+
+class ExtendedError<T extends string = string> extends Error {
   public status: number = -1;
   public params: any = null;
+  public code: T | Code = "UNKNOWN";
 }
 
 export class Req {
@@ -29,11 +31,13 @@ export class Req {
   public credentials?: RequestCredentials;
   public handlers: ReqEventHandler[];
   public readonly url: string;
-  constructor(url: string, debug = false) {
+  public readonly suppressErrors: boolean;
+  constructor(url: string, suppressErrors = false, debug = false) {
     this.debug = debug;
     this.headers = {};
     this.handlers = [];
     this.credentials = "same-origin";
+    this.suppressErrors = suppressErrors;
     this.url = url;
   }
   async [ReqMethod.GET](url: string, query: Record<string, string> = {}) {
@@ -84,10 +88,13 @@ export class Req {
         // eslint-disable-next-line no-console
         console.log("request.raw fetch_error", err);
       }
-      const error = err as ExtendedError;
-      error.network = true;
+      const error = err as ExtendedError<Code>;
+      error.code = "NETWORK";
       error.status = -1;
       this.callHandlers(ReqEventType.Error, error);
+      if (this.suppressErrors) {
+        return;
+      }
       throw error;
     }
 
@@ -110,6 +117,9 @@ export class Req {
       const error = new ExtendedError(text);
       error.status = result.status;
       this.callHandlers(ReqEventType.Error, error);
+      if (this.suppressErrors) {
+        return;
+      }
       throw error;
     }
 
@@ -128,7 +138,13 @@ export class Req {
       if (params) {
         error.params = params;
       }
+      if (json.code) {
+        error.code = json.code;
+      }
       this.callHandlers(ReqEventType.Error, error);
+      if (this.suppressErrors) {
+        return;
+      }
       throw error;
     }
     return json;
