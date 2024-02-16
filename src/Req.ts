@@ -40,7 +40,11 @@ export class Req {
     this.suppressErrors = suppressErrors;
     this.url = url;
   }
-  async [ReqMethod.GET](url: string, query: Record<string, string> = {}) {
+  async [ReqMethod.GET](
+    url: string,
+    query: Record<string, string> = {},
+    suppressErrors?: boolean
+  ) {
     const keys = Object.keys(query);
     if (keys.length) {
       url += "?";
@@ -51,26 +55,64 @@ export class Req {
         )
         .join("&");
     }
-    return await this.standardRequest(url, ReqMethod.GET);
+    return await this.standardRequest(
+      url,
+      ReqMethod.GET,
+      undefined,
+      suppressErrors
+    );
   }
-  async [ReqMethod.PUT](url: string, body: JsonValue) {
-    return await this.standardRequest(url, ReqMethod.PUT, body);
+  async [ReqMethod.PUT](
+    url: string,
+    body: JsonValue,
+    suppressErrors?: boolean
+  ) {
+    return await this.standardRequest(url, ReqMethod.PUT, body, suppressErrors);
   }
-  async [ReqMethod.POST](url: string, body: JsonValue) {
-    return await this.standardRequest(url, ReqMethod.POST, body);
+  async [ReqMethod.POST](
+    url: string,
+    body: JsonValue,
+    suppressErrors?: boolean
+  ) {
+    return await this.standardRequest(
+      url,
+      ReqMethod.POST,
+      body,
+      suppressErrors
+    );
   }
-  async [ReqMethod.DELETE](url: string, body: JsonValue) {
-    return await this.standardRequest(url, ReqMethod.DELETE, body);
+  async [ReqMethod.DELETE](
+    url: string,
+    body: JsonValue,
+    suppressErrors?: boolean
+  ) {
+    return await this.standardRequest(
+      url,
+      ReqMethod.DELETE,
+      body,
+      suppressErrors
+    );
   }
-  async standardRequest(url: string, method: ReqMethod, body?: JsonValue) {
-    return await this.raw(`${this.url}${url}`, {
-      headers: this.headers,
-      credentials: this.credentials,
-      method,
-      body: JSON.stringify(body),
-    });
+  async standardRequest(
+    url: string,
+    method: ReqMethod,
+    body?: JsonValue,
+    suppressErrors?: boolean
+  ) {
+    return await this.raw(
+      `${this.url}${url}`,
+      {
+        headers: this.headers,
+        credentials: this.credentials,
+        method,
+        body: JSON.stringify(body),
+      },
+      suppressErrors
+    );
   }
-  async raw(url: string, options: RequestInit) {
+  async raw(url: string, options: RequestInit, suppressErrors?: boolean) {
+    const se =
+      suppressErrors === false ? false : suppressErrors || this.suppressErrors;
     if (this.debug) {
       // eslint-disable-next-line no-console
       console.log("request.raw", `${options.method} ${url}`);
@@ -92,7 +134,7 @@ export class Req {
       error.code = "NETWORK";
       error.status = -1;
       this.callHandlers(ReqEventType.Error, error);
-      if (this.suppressErrors) {
+      if (se) {
         return;
       }
       throw error;
@@ -117,7 +159,7 @@ export class Req {
       const error = new ExtendedError(text);
       error.status = result.status;
       this.callHandlers(ReqEventType.Error, error);
-      if (this.suppressErrors) {
+      if (se) {
         return;
       }
       throw error;
@@ -142,7 +184,7 @@ export class Req {
         error.code = json.code;
       }
       this.callHandlers(ReqEventType.Error, error);
-      if (this.suppressErrors) {
+      if (se) {
         return;
       }
       throw error;

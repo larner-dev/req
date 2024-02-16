@@ -23,7 +23,7 @@
     "lint": "eslint .",
     "postversion": "git push && git push --tags",
     "prepare": "yarn build",
-    "prepublishOnly": "yarn test",
+    "prepublishOnly": "yarn test && yarn build",
     "test": "vitest --run --dir ./src",
     "test-watch": "vitest --dir ./src",
     "test-coverage": "vitest run --dir ./src --coverage"
