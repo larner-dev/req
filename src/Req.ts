@@ -40,7 +40,7 @@ export class Req {
     this.suppressErrors = suppressErrors;
     this.url = url;
   }
-  async [ReqMethod.GET](
+  async [ReqMethod.GET]<T = unknown>(
     url: string,
     query: Record<string, string> = {},
     suppressErrors?: boolean
@@ -55,51 +55,56 @@ export class Req {
         )
         .join("&");
     }
-    return await this.standardRequest(
+    return await this.standardRequest<T>(
       url,
       ReqMethod.GET,
       undefined,
       suppressErrors
     );
   }
-  async [ReqMethod.PUT](
+  async [ReqMethod.PUT]<T = unknown>(
     url: string,
     body: JsonValue,
     suppressErrors?: boolean
   ) {
-    return await this.standardRequest(url, ReqMethod.PUT, body, suppressErrors);
+    return await this.standardRequest<T>(
+      url,
+      ReqMethod.PUT,
+      body,
+      suppressErrors
+    );
   }
-  async [ReqMethod.POST](
+  async [ReqMethod.POST]<T = unknown>(
     url: string,
     body: JsonValue,
     suppressErrors?: boolean
   ) {
-    return await this.standardRequest(
+    return await this.standardRequest<T>(
       url,
       ReqMethod.POST,
       body,
       suppressErrors
     );
   }
-  async [ReqMethod.DELETE](
+  async [ReqMethod.DELETE]<T = unknown>(
     url: string,
     body: JsonValue,
     suppressErrors?: boolean
   ) {
-    return await this.standardRequest(
+    return await this.standardRequest<T>(
       url,
       ReqMethod.DELETE,
       body,
       suppressErrors
     );
   }
-  async standardRequest(
+  async standardRequest<T = unknown>(
     url: string,
     method: ReqMethod,
     body?: JsonValue,
     suppressErrors?: boolean
   ) {
-    return await this.raw(
+    return await this.raw<T>(
       `${this.url}${url}`,
       {
         headers: this.headers,
@@ -110,7 +115,11 @@ export class Req {
       suppressErrors
     );
   }
-  async raw(url: string, options: RequestInit, suppressErrors?: boolean) {
+  async raw<T = unknown>(
+    url: string,
+    options: RequestInit,
+    suppressErrors?: boolean
+  ): Promise<T | undefined> {
     const se =
       suppressErrors === false ? false : suppressErrors || this.suppressErrors;
     if (this.debug) {
