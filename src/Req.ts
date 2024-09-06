@@ -113,7 +113,7 @@ export class Req {
         headers: this.headers,
         credentials: this.credentials,
         method,
-        body: JSON.stringify(body),
+        body,
       },
       suppressErrors
     );
