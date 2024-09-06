@@ -104,13 +104,21 @@ export class Req {
     body?: JsonValue | FormData,
     suppressErrors?: boolean
   ) {
+    const headers = { ...this.headers };
     if (!(body instanceof FormData)) {
       body = JSON.stringify(body);
+    } else {
+      const contentTypeHeaderKeys = Object.keys(headers).filter(
+        (h) => h.toLowerCase() === "content-type"
+      );
+      for (const h of contentTypeHeaderKeys) {
+        delete headers[h];
+      }
     }
     return await this.raw<T>(
       `${this.url}${url}`,
       {
-        headers: this.headers,
+        headers,
         credentials: this.credentials,
         method,
         body,
