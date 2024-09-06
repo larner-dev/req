@@ -101,9 +101,12 @@ export class Req {
   async standardRequest<T = unknown>(
     url: string,
     method: ReqMethod,
-    body?: JsonValue,
+    body?: JsonValue | FormData,
     suppressErrors?: boolean
   ) {
+    if (!(body instanceof FormData)) {
+      body = JSON.stringify(body);
+    }
     return await this.raw<T>(
       `${this.url}${url}`,
       {
