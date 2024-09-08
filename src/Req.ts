@@ -102,7 +102,7 @@ export class Req {
     url: string,
     method: ReqMethod,
     body?: JsonValue | FormData,
-    suppressErrors?: boolean
+    suppressErrors: boolean = false
   ) {
     const headers = { ...this.headers };
     if (!(body instanceof FormData)) {
@@ -123,13 +123,24 @@ export class Req {
         method,
         body,
       },
+      // @ts-expect-error
       suppressErrors
     );
   }
-  async raw<T = unknown>(
+  async raw<T>(
     url: string,
     options: RequestInit,
-    suppressErrors?: boolean
+    suppressErrors: false
+  ): Promise<T>;
+  async raw<T>(
+    url: string,
+    options: RequestInit,
+    suppressErrors: true
+  ): Promise<T | undefined>;
+  async raw<T>(
+    url: string,
+    options: RequestInit,
+    suppressErrors: boolean = false
   ): Promise<T | undefined> {
     const se =
       suppressErrors === false ? false : suppressErrors || this.suppressErrors;
